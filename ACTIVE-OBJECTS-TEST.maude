@@ -1,0 +1,62 @@
+
+mod ACTIVE-OBJECTS-TEST is
+  ex ACTIVE-OBJECTS .
+  
+  op xValue : -> Int .
+  eq xValue = 3 .
+     --- op x : -> LocalVar .
+    
+  ops SS St : -> Statement .
+  op e : -> Expr .
+  op S : -> Statement .
+  
+  
+  ops add m : -> MethodName [ctor] .
+  op x : -> LocalVar [ctor] .
+  op y : -> LocalVar [ctor] .
+  op xx : -> VarSet [ctor] .
+  
+  op pl : -> ParamList [ctor] .
+  eq pl = x y .
+  
+  op T : -> Type .
+  eq T = bool .
+  op LV : -> LocalVar .
+  op ob1 : -> Oid .
+  op sig1 : -> Oid .
+  op methBod1 : -> Oid .
+  op meth1 : -> Oid .
+  op objTest : -> Configuration .
+  op someBool : -> ValueOption .
+  op duA : -> Args .
+  ops fut1 fut2 : -> Oid .
+    
+  op futureList : -> FutureList .
+  eq futureList = < fut1 : Future | value : someBool, state : unresolved > :: 
+  				< fut2 : Future | value : someBool, state : resolved > :: 
+  				nil .
+    
+  eq objTest = < ob1 : OBJECT |  id : ob1, fields : xValue, proc : { LV | ( x = e . m(duA) after futureList ) ; S }, suspended : emptyPool > 
+  
+  < sig1 : SIGNATURE | ret : bool, name : add, params : pl > 
+  < methBod1 : METHODBODY | locals : x, stmt : SS > 
+  < meth1 : METHOD | sig : sig1, body : methBod1 > .
+  
+  ---class SIGNATURE | ret : Type, name : MethodName, params : ParamList .
+  ---class METHOD | sig : Object, body : Object .  
+  ---class METHODBODY | locals : VarSet, stmt : Statement .
+  
+
+  
+  
+  
+ --- op initList : -> FutureList .
+ ---  eq initList = < fut1 : Future | value : someBool, state : resolved > :: nil . 
+ --- :: nil
+
+  op futureTest : -> Configuration .
+  eq futureTest = < fut1 : Future | value : someBool, state : unresolved > .
+
+endm
+---rew in ACTIVE-OBJECTS-TEST : objTest .
+

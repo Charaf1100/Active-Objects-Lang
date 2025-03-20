@@ -1,0 +1,105 @@
+
+mod SELF-SYNC-CALL is
+  protecting ACTIVE-OBJECTS .
+
+op _,_ : Value Value -> Args [ctor] .
+ops three four : -> Value .
+
+
+  op xValue : -> Int .
+  eq xValue = 3 .
+     --- op x : -> LocalVar .
+    
+  ops St : -> Statement .
+  op e : -> Expr .
+  op S : -> Statement .
+  
+  
+  op xx : -> VarSet [ctor] .
+  
+  op pl : -> ParamList [ctor] .
+  eq pl = x y .
+  
+  op T : -> Type .
+  eq T = bool .
+  op LV : -> LocalVarList .
+  op ob1 : -> Oid .
+  op sig1 : -> Oid .
+  op methBod1 : -> Oid .
+  op meth1 : -> Oid .
+  op objTest1 : -> Configuration .
+  op objTest2 : -> Configuration .
+  op someBool : -> ValueOption .
+  op duA : -> Args .
+  op fut1 : -> Oid .
+  
+  eq duA = (three, four) .
+  
+  ---op x : -> LocalVar [ctor] .
+  ---op y : -> LocalVar [ctor] . 
+  ---op destiny : -> Destiny .
+  ---eq destiny = fut1 .
+  ---op LVList : -> LocalVarList .
+  ---eq LVList = destiny ; x ; y ; emptyVarList .
+  
+  op x : -> LocalVar [ctor] .
+  op y : -> LocalVar [ctor] . 
+  op destiny : -> Destiny .
+  eq destiny = fut1 .
+  op LVList : -> LocalVarList .
+  eq LVList = destiny ; x ; y ; emptyVarList .
+   
+
+----------
+  op X : -> LocalVar .
+
+ 
+
+  vars O F : Oid  .
+  var M : MethodName .
+  var A : Args .
+op bindFut : FutureOid -> Statement .
+eq bindFut(F) = ( x := F ) .
+
+op bindParams : Args -> Statement .
+eq bindParams(three, four) = ( x := three ) ; ( y := four ) .
+  
+  op bind : Oid FutureOid MethodName Args -> ProcessState .
+  eq bind(O, F, M, A) = { LVList | bindFut(F) ; bindParams(three, four) } .
+  
+  op bindS : Oid FutureOid MethodName Args Statement -> ProcessState .
+  eq bindS(O, F, M, A, S) = { LVList | bindFut(F) ; bindParams(three, four); S } .
+  
+  
+  ops add : -> MethodName [ctor] .
+  op ob1 : -> Oid .
+  op duA : -> Args .
+  ops fut1 fut2 : -> FutureOid .
+  op someBool : -> ValueOption .
+
+  op futureTest : -> Configuration .
+  eq futureTest = < fut1 : Future | value : someBool, state : unresolved > .
+  op ST : -> Statement .
+  eq ST = suspend ; suspend3 ; cont(fut2) .
+  
+  eq objTest1 = < ob1 : OBJECT |  id : ob1, fields : xValue, proc : bindS(ob1, fut1, add, duA, ST), suspended : emptyPool > 
+  < sig1 : SIGNATURE | ret : int, name : add, params : pl > 
+  < methBod1 : METHODBODY | locals : LVList, stmt : ST > 
+  < meth1 : METHOD | sig : sig1, body : methBod1 > .
+  
+    eq objTest2 = < ob1 : OBJECT |  id : ob1, fields : xValue, proc : bind(ob1, fut1, add, duA), suspended : emptyPool > 
+  < sig1 : SIGNATURE | ret : int, name : add, params : pl > 
+  < methBod1 : METHODBODY | locals : LVList, stmt : ST > 
+  < meth1 : METHOD | sig : sig1, body : methBod1 > .
+  
+
+
+  op testBind : -> ProcessState .
+  eq testBind = bind(ob1, fut1, add, duA) .
+
+endm
+---red in SELF-SYNC-CALL : testBind .
+---red in SELF-SYNC-CALL : objTest1 .
+---red in SELF-SYNC-CALL : objTest2 .
+
+---rew in ACTIVE-OBJECTS-TEST : objTest .
