@@ -1,0 +1,167 @@
+
+omod ACTIVE-OBJECTS-SEMANTICS is
+  protecting ACTIVE-OBJECTS-BASE .
+
+
+
+  vars P1 P2 : LocalVar .
+  vars V1 V2 : Value .
+  var F : FutureOid .
+  var X : LocalVarList .
+  var S : Statement .
+  var M : MethodName .
+  var PL : ParamList .
+  var A : Args .
+  
+  op bindParams : ParamList Args -> Statement .
+  eq bindParams(P1 P2, (V1, V2)) = ( P1 := V1 ) ; ( P2 := V2 ) .
+
+  op bindFut : FutureOid -> Statement .
+  eq bindFut(F) = ( destiny := F ) .
+  ops MBOD SIG : -> Oid .
+  op FPrime  : -> Oid .
+
+
+  op bind : Oid FutureOid MethodName Args -> ProcessState .
+  
+  op bindS : Oid FutureOid Object Object Args Oid -> ProcessState .
+   eq bindS(O, FPrime, < MBOD : METHODBODY | locals : X, stmt : S >, 
+   < SIG : SIGNATURE | name : M, params : PL >, A, F) = 
+   { destiny ; X | bindFut(F); bindParams(PL, A); S ;  cont (F) } .
+  
+
+
+ 
+ 
+  vars F : FutureOid .
+  vars O  MEE SIGG   MBODD  FF  FFP : Oid .
+  vars a       : Int .
+  vars L  LVV LP  x   : LocalVar .
+  vars E       : Expr .
+  vars M  : MethodName .
+  vars dummyA A : Args .
+  vars S   SS    : Statement .
+  vars Q  P     : ProcessPool .
+  var FS       : FutureState .
+  var FSS       : FutureList .
+  vars LL LLL  X : LocalVarList .
+  vars VV V : ValueOption .
+  var PL : ParamList .
+  
+ 
+    	
+    	
+    	
+
+
+  op someBool : -> ValueOption .
+ op futureTest : -> Configuration .
+  eq futureTest = < FPrime : Future | value : someBool, state : unresolved > .
+
+  op xx : -> LocalVar [ctor] . 
+  op yy : -> LocalVar [ctor] . 
+ops three four : -> Value .
+
+
+
+op LVList : -> LocalVarList .
+eq LVList = destiny ; xx ; yy ; emptyVarList .
+
+
+    	
+
+  
+  
+   
+
+    
+     var OO : Oid .  
+    
+    
+    
+    
+     rl [Sync-Call-After] :
+
+    < O : OBJECT | id : O, fields : a,       
+    proc : { L | ( x = E . M(dummyA) after FSS ) ; S },
+    suspended : P >
+    =>
+    
+    < O : OBJECT |  id : O, fields : 700, 
+    proc : { L | ---suspend3 },
+    	if allResolvedList(FSS) 
+    	then ( x = E . M(dummyA) ) ; S
+    	else  ( suspend3 ; x = E . M(dummyA) after FSS ) ; S
+    	---else (suspend ) ; S 
+    	fi}, 
+    	suspended : P > .
+    	
+    
+    
+    
+    rl [Self-Sync-Call] :
+
+  < SIGG : SIGNATURE | name : M, params : PL > 
+  < MBODD : METHODBODY | locals : X, stmt : SS > 
+  < MEE : METHOD | sig : SIG, body : MBOD >
+  
+	< FF : Future | >
+    < O : OBJECT | id : O, fields : 4,       
+    proc : { L | ( x = E . M(dummyA) ) ; S },
+    suspended : P >
+    =>
+    
+    < O : OBJECT |  id : O, fields : 200, 
+    	suspended : P ; { L | ( x := get(FPrime) ) ; S } > 
+    < FPrime : Future | > .
+    
+    
+    
+     
+  rl [Sync-Call] :
+	< O : OBJECT | id : O, fields : 5,       
+    proc : { L | ( x = E . M(dummyA) ) ; S },
+    suspended : P >    =>
+    < O : OBJECT | id : O, fields : 400, 
+    proc : { L | ( FPrime = E ! M(dummyA) ) ; ( x := get(FPrime) ) ; S },
+    suspended : P > 
+    < FPrime : Future | > .
+    
+ 
+  rl [Return] :
+      < FF : Future | value : V, state : unresolved >
+    < O : OBJECT | id : O, fields : 330, proc : { LL | return(E) ; S }, suspended : Q  >
+    =>
+    < O : OBJECT | id : O, fields : 500, proc : { LL | S }, suspended : Q > 
+       < FF : Future | value : someInt(50), state : resolved > . 
+   
+   rl [Invoc] :
+     < SIGG : SIGNATURE | name : M, params : PL > 
+  < MBODD : METHODBODY | locals : X, stmt : SS > 
+  < MEE : METHOD | sig : SIG, body : MBOD >
+	< FF : Future | >
+    < O : OBJECT | id : O, fields : 100, suspended : P >
+    invoc(O, FF, M, dummyA)
+  =>
+    < O : OBJECT | id : O, fields : 600, suspended : P ; (bindS(O, FPrime, < MBODD : METHODBODY | >, < SIGG : SIGNATURE | > ,  dummyA, FF)) >
+    < FPrime : Future | > .
+  
+  ---  bindS(O, FPrime, < MBOD : METHODBODY | >, < SIG : SIGNATURE | > ,  dummyA, FF )
+  ---  op bindS : Oid FutureOid Object Object Args Oid -> ProcessState .
+  
+  
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+  
+endom
